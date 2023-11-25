@@ -1,0 +1,457 @@
+openapi: 3.0.3
+security: []
+info:
+  title: Projects and tasks application
+  contact:
+    email: vaclav.dokoupil@gmail.com
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+tags:
+  - name: project
+  - name: task
+  - name: tag
+
+paths:
+  /projects:
+    get:
+      tags:
+        - project
+      summary: Get a list of all projects
+      operationId: getProjects
+      responses:
+        "200":
+          description: List of projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/project"
+    post:
+      tags:
+        - project
+      summary: Create a new project
+      operationId: createProject
+      requestBody:
+        description: New project
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/project"
+      responses:
+        "201":
+          description: Project created
+          headers:
+            Location:
+              schema:
+                type: string
+              description: URI of the created project
+        "400":
+          description: Invalid request format
+  /projects/{projId}:
+    get:
+      tags:
+        - project
+      summary: Find project by ID
+      operationId: getProjectById
+      parameters:
+        - $ref: "#/components/parameters/projectId"
+      responses:
+        "200":
+          description: Project details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/project"
+        "400":
+          description: Invalid ID
+        "404":
+          description: Project not found
+    put:
+      tags:
+        - project
+      summary: Update an existing project
+      operationId: updateProject
+      parameters:
+        - $ref: "#/components/parameters/projectId"
+      requestBody:
+        description: Project with updated data
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/project"
+      responses:
+        "204":
+          description: Project updated
+        "400":
+          description: Invalid ID
+        "404":
+          description: Project not found
+    delete:
+      tags:
+        - project
+      summary: Delete an existing project
+      description: This operation will also delete all assigned tasks
+      operationId: deleteProject
+      parameters:
+        - $ref: "#/components/parameters/projectId"
+      responses:
+        "204":
+          description: Project deleted
+        "400":
+          description: Invalid ID
+        "404":
+          description: Project not found
+  /projects/{projId}/tasks:
+    get:
+      tags:
+        - task
+      summary: Get a list of all tasks from one project
+      operationId: getProjectTasks
+      parameters:
+        - $ref: "#/components/parameters/projectId"
+      responses:
+        "303":
+          description: Found elsewhere
+    post:
+      tags:
+        - task
+      summary: Create a new task for project
+      operationId: createProjectTask
+      parameters:
+        - $ref: "#/components/parameters/projectId"
+      requestBody:
+        description: New task
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/task"
+      responses:
+        "201":
+          description: Task created
+          headers:
+            Location:
+              schema:
+                type: string
+              description: URI of the created task
+        "400":
+          description: Invalid request format
+  /projects/{projId}/tasks/{taskId}:
+    get:
+      tags:
+        - task
+      summary: Find task from project by ID
+      operationId: getProjectTaskById
+      parameters:
+        - $ref: "#/components/parameters/projectId"
+        - $ref: "#/components/parameters/taskId"
+      responses:
+        "200":
+          description: Task details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/task"
+        "400":
+          description: Invalid ID
+        "404":
+          description: Task not found
+    put:
+      tags:
+        - task
+      summary: Update an existing task from project
+      operationId: updateProjectTask
+      parameters:
+        - $ref: "#/components/parameters/projectId"
+        - $ref: "#/components/parameters/taskId"
+      requestBody:
+        description: Task with updated data
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/task"
+      responses:
+        "204":
+          description: Task updated
+        "400":
+          description: Invalid ID
+        "404":
+          description: Task not found
+    delete:
+      tags:
+        - task
+      summary: Delete an existing task
+      operationId: deleteProjectTask
+      parameters:
+        - $ref: "#/components/parameters/projectId"
+        - $ref: "#/components/parameters/taskId"
+      responses:
+        "204":
+          description: Task deleted
+        "400":
+          description: Invalid ID
+        "404":
+          description: Task not found
+#------------------------------------------
+  /tasks:
+    get:
+      tags:
+        - task
+      summary: Get a list of all tasks
+      operationId: getAllTasks
+      parameters:
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/tag"
+        - $ref: "#/components/parameters/taskDescription"
+        - $ref: "#/components/parameters/taskState"
+        - $ref: "#/components/parameters/project"
+      responses:
+        "200":
+          description: List of tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/task"
+  /tasks/{taskId}/tags:
+    put:
+      tags:
+        - tag
+      summary: Add an existing tag to a task
+      operationId: addTaskTag
+      parameters:
+        - $ref: "#/components/parameters/taskId"
+      requestBody:
+        description: Tag to be added
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/tag"
+      responses:
+        "204":
+          description: Tag added
+        "400":
+          description: Invalid ID
+        "404":
+          description: Not found
+    delete:
+      tags:
+        - tag
+      summary: Remove a tag from a task
+      operationId: deleteTaskTag
+      parameters:
+        - $ref: "#/components/parameters/taskId"
+        - name: tag
+          in: query
+          description: Name of the tag we want to remove from task
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Tag added
+        "400":
+          description: Invalid ID
+        "404":
+          description: Not found
+# -------------------------------------------------
+  /tags:
+    get:
+      tags:
+        - tag
+      summary: Get a list of all tags
+      operationId: getTags
+      responses:
+        "200":
+          description: List of tags
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/tag"
+    post:
+      tags:
+        - tag
+      summary: Create a new tag
+      operationId: createTag
+      requestBody:
+        description: New tag
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/tag"
+      responses:
+        "201":
+          description: Tag created
+          headers:
+            Location:
+              schema:
+                type: string
+              description: URI of the created tag
+        "400":
+          description: Invalid request format
+  /tags/{tagId}:
+    get:
+      tags:
+        - tag
+      summary: Find tag by ID
+      operationId: getTagById
+      parameters:
+        - $ref: "#/components/parameters/tagId"
+      responses:
+        "200":
+          description: Tag details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tag"
+        "400":
+          description: Invalid ID
+        "404":
+          description: Tag not found
+    put:
+      tags:
+        - tag
+      summary: Update an existing tag
+      operationId: updateTag
+      parameters:
+        - $ref: "#/components/parameters/tagId"
+      requestBody:
+        description: Tag with updated data
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/tag"
+      responses:
+        "204":
+          description: Tag updated
+        "400":
+          description: Invalid ID
+        "404":
+          description: Tag not found
+    delete:
+      tags:
+        - tag
+      summary: Delete an existing tag
+      description: This operation will also delete all references from tasks
+      operationId: deleteTag
+      parameters:
+        - $ref: "#/components/parameters/tagId"
+      responses:
+        "204":
+          description: Tag deleted
+        "400":
+          description: Invalid ID
+        "404":
+          description: Tag not found
+
+components:
+  parameters:
+    projectId:
+      name: projId
+      in: path
+      required: true
+      description: ID of the requested project
+      schema:
+        type: integer
+    taskId:
+      name: taskId
+      in: path
+      required: true
+      description: ID of the requested task
+      schema:
+        type: integer
+    tagId:
+      name: tagId
+      in: path
+      required: true
+      description: ID of the requested tag
+      schema:
+        type: integer
+    project:
+      name: proj
+      in: query
+      description: ID of project we are searching
+      schema:
+        type: integer
+    limit:
+      name: limit
+      in: query
+      description: Number of results we want to obtain
+      schema:
+        type: integer
+    page:
+      name: page
+      in: query
+      description: Used in conjunction with limit parameter. If you use it and don't specify a limit, paging is ignored. Use it for pagination based on the limit parameter
+      schema:
+        type: integer
+    tag:
+      name: tag
+      in: query
+      description: Filters tasks containing specified tag. Name of the tag is used
+      schema:
+        type: string
+    taskDescription:
+      name: desc
+      in: query
+      description: Filters tasks containing specified description
+      schema:
+        type: string
+    taskState:
+      name: state
+      in: query
+      description: State of the task
+      schema:
+        type: string
+        enum:
+          - new
+          - in progress
+          - done
+  schemas:
+    project:
+      type: object
+      properties:
+        projId:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+        description:
+          type: string
+        dates:
+          type: array
+          items:
+            type: string
+    task:
+      type: object
+      properties:
+        taskId:
+          type: integer
+          readOnly: true
+        description:
+          type: string
+        state:
+          type: string
+          enum:
+            - new
+            - in progress
+            - done
+        projId:
+          type: integer
+          readOnly: true
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/tag"
+    tag:
+      type: object
+      properties:
+        tagId:
+          type: integer
+          readOnly: true
+        name:
+          type: string
