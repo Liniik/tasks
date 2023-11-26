@@ -111,6 +111,11 @@ paths:
       operationId: getProjectTasks
       parameters:
         - $ref: "#/components/parameters/projectId"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/tag"
+        - $ref: "#/components/parameters/taskDescription"
+        - $ref: "#/components/parameters/taskState"
       responses:
         "303":
           description: Found elsewhere
