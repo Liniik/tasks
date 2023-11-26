@@ -246,6 +246,7 @@ paths:
         - $ref: "#/components/parameters/taskId"
         - name: tag
           in: query
+          required: true
           description: Name of the tag we want to remove from task
           schema:
             type: string
@@ -414,6 +415,12 @@ components:
   schemas:
     project:
       type: object
+      required:
+        - name
+        - description
+        - dateStart
+        - dateEnd
+      additionalProperties: false
       properties:
         projId:
           type: integer
@@ -422,12 +429,18 @@ components:
           type: string
         description:
           type: string
-        dates:
-          type: array
-          items:
-            type: string
+        dateStart:
+          type: string
+          format: date
+        dateEnd:
+          type: string
+          format: date
     task:
       type: object
+      required:
+        - description
+        - state
+      additionalProperties: false
       properties:
         taskId:
           type: integer
@@ -445,10 +458,14 @@ components:
           readOnly: true
         tags:
           type: array
+          readOnly: true
           items:
             $ref: "#/components/schemas/tag"
     tag:
       type: object
+      required:
+        - name
+      additionalProperties: false
       properties:
         tagId:
           type: integer
